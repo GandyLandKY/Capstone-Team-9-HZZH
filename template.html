@@ -31,7 +31,11 @@
 
     .viewport { width: 100vw; height: 100vh; overflow: auto; background: var(--bg); }
     .poster-wrap { transform-origin: top left; width: 48in; height: 36in; }
-    @media print { .poster-wrap { transform: none !important; } .toolbar { display: none; } }
+    @media print {
+      .poster-wrap { transform: none !important; }
+      .toolbar, #zoom, #zoomLabel { display: none !important; visibility: hidden !important; }
+    }
+
 
     .toolbar {
       position: fixed; top: 8px; left: 8px; z-index: 9999;
@@ -42,8 +46,8 @@
     .toolbar input[type="range"] { width: 180px; }
 
     .poster {
-      box-sizing: border-box; width: 48in; height: 36in; padding: 0.6in;
-      display: grid; grid-template-rows: auto auto 1fr; gap: 0.25in;
+      box-sizing: border-box; width: 48in; height: 36in; padding: 0.6in 0.6in 0.2in;
+      display: grid; grid-template-rows: auto auto auto auto; gap: 0.22in;
       color: var(--text); background: var(--bg);
     }
 
@@ -69,7 +73,9 @@
 
     .arch-box { background: var(--card); border: 0.03in solid var(--border); border-radius: 0.12in; padding: 0.18in; }
 
-    .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25in; align-items: center; font-size: 0.35in; margin-top: 0.1in; color: var(--muted); }
+    /*.footer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25in; align-items: center; font-size: 0.35in; margin-top: 0.1in; color: var(--muted); }*/
+    .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.22in; align-items: center; font-size: 0.35in; margin-top: 0; color: var(--muted); }
+
     .foot-right { text-align: right; color: var(--accent); font-weight: 700; }
 
     /* architecture SVG responsiveness + theming */
@@ -187,8 +193,64 @@
       svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
       function rect(x,y,w,h,r){ const el=document.createElementNS(svgNS,'rect'); el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('width',w); el.setAttribute('height',h); el.setAttribute('rx',r); el.setAttribute('ry',r); el.setAttribute('fill','#fff'); el.setAttribute('stroke','#000'); el.setAttribute('stroke-width','3'); return el; }
-      function label(x,y,t){ const tx=document.createElementNS(svgNS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y); tx.setAttribute('font-size','24'); tx.setAttribute('font-family','Arial, Helvetica, sans-serif'); tx.textContent=t; return tx; }
+      
+      //disabling, text is escaping its boundaries in the arch map/chart
+      //function label(x,y,t){ const tx=document.createElementNS(svgNS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y); tx.setAttribute('font-size','24'); tx.setAttribute('font-family','Arial, Helvetica, sans-serif'); tx.textContent=t; return tx; }
       function arrow(x1,y1,x2,y2){ const line=document.createElementNS(svgNS,'line'); line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2); line.setAttribute('stroke','#000'); line.setAttribute('stroke-width','3'); svg.appendChild(line); const ah=document.createElementNS(svgNS,'polygon'); const a=Math.atan2(y2-y1,x2-x1),L=14; const p1=[x2,y2]; const p2=[x2-L*Math.cos(a-Math.PI/6), y2-L*Math.sin(a-Math.PI/6)]; const p3=[x2-L*Math.cos(a+Math.PI/6), y2-L*Math.sin(a+Math.PI/6)]; ah.setAttribute('points', `${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}`); ah.setAttribute('fill','#000'); svg.appendChild(ah); }
+      function wrapLabel(svg, x, y, w, h, text, opts = {}) {
+        const fontSize = opts.fontSize || 24;
+        const lineHeight = Math.round(fontSize * 1.25);
+
+        // Padding inside the rounded rect
+        const padX = opts.padX ?? 12;
+        const padY = opts.padY ?? 12;
+
+        const maxWidth = Math.max(20, w - 2 * padX);
+        const cx = x + w / 2;
+
+        // Measuring node
+        const t = document.createElementNS(svgNS, 'text');
+        t.setAttribute('font-size', String(fontSize));
+        t.setAttribute('font-family', 'Arial, Helvetica, sans-serif');
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('dominant-baseline', 'text-before-edge'); // y is the top of the text box
+        svg.appendChild(t);
+
+        const words = String(text).split(/\s+/);
+        const lines = [];
+        let line = '';
+
+        function widthOf(str) {
+          t.textContent = str || ' ';
+          return t.getComputedTextLength();
+        }
+
+        for (const wd of words) {
+          const tryLine = line ? line + ' ' + wd : wd;
+          if (widthOf(tryLine) <= maxWidth) {
+            line = tryLine;
+          } else {
+            if (line) lines.push(line);
+            line = wd;
+          }
+        }
+        if (line) lines.push(line);
+
+        // Center within the vertical space AFTER padding
+        const blockH = lines.length * lineHeight;
+        const startY = y + padY + Math.max(0, (h - 2 * padY - blockH) / 2);
+
+        t.textContent = '';
+        lines.forEach((ln, i) => {
+          const span = document.createElementNS(svgNS, 'tspan');
+          span.setAttribute('x', String(cx));
+          span.setAttribute('y', String(startY + i * lineHeight));
+          span.textContent = ln;
+          t.appendChild(span);
+        });
+
+        return t;
+      }
 
       const nodes = {
         browser:{x:30,y:50,w:150,h:60,t:'Browser'},
@@ -199,7 +261,8 @@
         s3:{x:790,y:170,w:100,h:60,t:'S3'},
         cf:{x:460,y:270,w:200,h:60,t:'CloudFront'}
       };
-      Object.values(nodes).forEach(n => { svg.appendChild(rect(n.x,n.y,n.w,n.h,10)); svg.appendChild(label(n.x+10,n.y+38,n.t)); });
+      Object.values(nodes).forEach(n => {svg.appendChild(rect(n.x, n.y, n.w, n.h, 10));svg.appendChild(wrapLabel(svg, n.x, n.y, n.w, n.h, n.t, { fontSize: 22 }));});
+
 
       arrow(180,80,210,80);
       arrow(430,80,460,80);
