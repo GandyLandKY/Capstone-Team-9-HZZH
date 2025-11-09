@@ -1,0 +1,9 @@
+{
+  "heading": "Technology Stack",
+  "items": [
+    "Next.js  TypeScript  Tailwind CSS",
+    "AWS Lambda  DynamoDB  S3  CloudFront",
+    "GitHub Actions  CI/CD",
+    "SST  Infrastructure as Code"
+  ]
+}
