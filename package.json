@@ -1,0 +1,14 @@
+{
+  "name": "hzzh-poster",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "render": "node scripts/render.js",
+    "all": "npm run build && npm run render"
+  },
+  "dependencies": {
+    "puppeteer": "^23.11.1"
+  }
+}

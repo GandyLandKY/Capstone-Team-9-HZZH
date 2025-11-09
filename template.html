@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HZZH Poster - 48x36</title>
+  <style>
+    /* Page size for print */
+    @page { size: 48in 36in; margin: 0; }
+
+    /* Theme variables */
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --accent: #BA0C2F;   /* UofL red */
+      --card: #ffffff;
+      --border: #000000;
+      --muted: #222222;
+      color-scheme: light dark;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    html { color-scheme: light dark; }
+    body { font-family: Calibri, Arial, Helvetica, sans-serif; }
+
+    .viewport { width: 100vw; height: 100vh; overflow: auto; background: var(--bg); }
+    .poster-wrap { transform-origin: top left; width: 48in; height: 36in; }
+    @media print {
+      .poster-wrap { transform: none !important; }
+      .toolbar, #zoom, #zoomLabel { display: none !important; visibility: hidden !important; }
+    }
+
+
+    .toolbar {
+      position: fixed; top: 8px; left: 8px; z-index: 9999;
+      background: rgba(255,255,255,0.92); border: 1px solid #ccc; border-radius: 8px;
+      padding: 6px 10px; font: 14px Arial, sans-serif;
+      display: grid; grid-auto-flow: column; gap: 8px; align-items: center;
+    }
+    .toolbar input[type="range"] { width: 180px; }
+
+    .poster {
+      box-sizing: border-box; width: 48in; height: 36in; padding: 0.6in 0.6in 0.2in;
+      display: grid; grid-template-rows: auto auto auto auto; gap: 0.22in;
+      color: var(--text); background: var(--bg);
+    }
+
+    .header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0.25in; }
+    .titleblock h1 { margin: 0; font-size: 1.4in; line-height: 1.05; font-weight: 700; letter-spacing: 0.3px; }
+    .titleblock h2 { margin: 0.1in 0 0 0; font-size: 0.6in; color: var(--accent); font-weight: 700; }
+    .logo { width: 1.4in; height: 1.4in; }
+
+    .band {
+      padding: 0.15in 0.25in; background: var(--accent); color: #ffffff;
+      font-weight: 700; font-size: 0.45in; letter-spacing: 0.3px; border-radius: 0.1in;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: auto; gap: 0.25in; align-content: start; }
+
+    section {
+      background: var(--card); border: 0.03in solid var(--border);
+      border-radius: 0.12in; padding: 0.2in 0.25in;
+    }
+    section h3 { margin: 0 0 0.12in 0; font-size: 0.5in; border-bottom: 0.02in solid var(--border); padding-bottom: 0.08in; }
+    section p, section li { font-size: 0.35in; line-height: 1.28; margin: 0.08in 0; }
+    ul { padding-left: 1.0em; margin: 0.08in 0; }
+
+    .arch-box { background: var(--card); border: 0.03in solid var(--border); border-radius: 0.12in; padding: 0.18in; }
+
+    /*.footer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25in; align-items: center; font-size: 0.35in; margin-top: 0.1in; color: var(--muted); }*/
+    .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.22in; align-items: center; font-size: 0.35in; margin-top: 0; color: var(--muted); }
+
+    .foot-right { text-align: right; color: var(--accent); font-weight: 700; }
+
+    /* architecture SVG responsiveness + theming */
+    .arch-box svg { width: 100%; height: auto; display: block; }
+    .arch-box svg rect { fill: var(--card); stroke: var(--border); }
+    .arch-box svg text { fill: var(--text); }
+    .arch-box svg line { stroke: var(--border); }
+    .arch-box svg polygon { fill: var(--border); }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1115;
+        --text: #e6e6e6;
+        --accent: #D21F3C;
+        --card: #171a21;
+        --border: #3a3f4b;
+        --muted: #b5b9c3;
+      }
+      .toolbar { background: rgba(20,22,28,0.92); border-color: #3a3f4b; }
+    }
+
+    /* Force light colors for print */
+    @media print {
+      :root {
+        --bg: #ffffff;
+        --text: #000000;
+        --accent: #BA0C2F;
+        --card: #ffffff;
+        --border: #000000;
+        --muted: #222222;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="window.print()">Print 48×36</button>
+    <label>Zoom <input id="zoom" type="range" min="10" max="100" value="100" oninput="manualZoom(this.value)"></label>
+    <span id="zoomLabel">100%</span>
+  </div>
+
+  <!-- Injected JSON at build time -->
+  <script type="application/json" id="cfg-title">/*CFG_TITLE*/</script>
+  <script type="application/json" id="cfg-intro">/*CFG_INTRO*/</script>
+  <script type="application/json" id="cfg-arch">/*CFG_ARCH*/</script>
+  <script type="application/json" id="cfg-tech">/*CFG_TECH*/</script>
+  <script type="application/json" id="cfg-team">/*CFG_TEAM*/</script>
+  <script type="application/json" id="cfg-time">/*CFG_TIME*/</script>
+  <script type="application/json" id="cfg-rev">/*CFG_REV*/</script>
+
+  <div class="viewport">
+    <div class="poster-wrap" id="wrap">
+      <div class="poster">
+        <div class="header">
+          <div class="titleblock">
+            <h1 id="title"></h1>
+            <h2 id="subtitle"></h2>
+          </div>
+          <div class="logo" aria-label="HZZH logo">
+            <svg viewBox="0 0 100 100" width="100%" height="100%" role="img">
+              <rect x="5" y="5" rx="18" ry="18" width="90" height="90" fill="#000000"></rect>
+              <polygon points="50,20 80,75 20,75" fill="#ffffff"></polygon>
+            </svg>
+          </div>
+        </div>
+
+        <div class="band" id="band"></div>
+
+        <div class="grid">
+          <section id="s-intro"><h3></h3><p id="intro-body"></p></section>
+          <section id="s-arch"><h3></h3><div class="arch-box" id="arch-svg"></div><p id="arch-cap"></p></section>
+          <section id="s-tech"><h3></h3><ul id="tech-list"></ul></section>
+          <section id="s-team"><h3></h3><ul id="team-list"></ul><p id="team-sponsor"></p></section>
+          <section id="s-time"><h3></h3><ul id="time-list"></ul></section>
+          <section id="s-rev"><h3></h3><p id="rev-body"></p></section>
+        </div>
+
+        <div class="footer">
+          <div>Speed School BACS Capstone Team 9 - HZZH</div>
+          <div class="foot-right">Presented at the University of Louisville Fall 2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const j = id => JSON.parse(document.getElementById(id).textContent);
+    const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+
+    const t = j('cfg-title'); set('title', t.title); set('subtitle', t.subtitle); set('band', t.band);
+
+    const intro = j('cfg-intro'); document.querySelector('#s-intro h3').textContent = intro.heading; set('intro-body', intro.body);
+
+    const arch = j('cfg-arch'); document.querySelector('#s-arch h3').textContent = arch.heading; set('arch-cap', arch.caption);
+
+    const tech = j('cfg-tech'); document.querySelector('#s-tech h3').textContent = tech.heading;
+    tech.items.forEach(v => { const li = document.createElement('li'); li.textContent = v; document.getElementById('tech-list').appendChild(li); });
+
+    const team = j('cfg-team'); document.querySelector('#s-team h3').textContent = team.heading;
+    team.members.forEach(v => { const li = document.createElement('li'); li.textContent = v; document.getElementById('team-list').appendChild(li); });
+    set('team-sponsor', team.sponsor);
+
+    const time = j('cfg-time'); document.querySelector('#s-time h3').textContent = time.heading;
+    time.items.forEach(v => { const li = document.createElement('li'); li.textContent = v; document.getElementById('time-list').appendChild(li); });
+
+    const rev = j('cfg-rev'); document.querySelector('#s-rev h3').textContent = rev.heading; set('rev-body', rev.body);
+
+    (function drawArch() {
+      const box = document.getElementById('arch-svg');
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('viewBox', '0 0 1000 360');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+      function rect(x,y,w,h,r){ const el=document.createElementNS(svgNS,'rect'); el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('width',w); el.setAttribute('height',h); el.setAttribute('rx',r); el.setAttribute('ry',r); el.setAttribute('fill','#fff'); el.setAttribute('stroke','#000'); el.setAttribute('stroke-width','3'); return el; }
+      
+      //disabling, text is escaping its boundaries in the arch map/chart
+      //function label(x,y,t){ const tx=document.createElementNS(svgNS,'text'); tx.setAttribute('x',x); tx.setAttribute('y',y); tx.setAttribute('font-size','24'); tx.setAttribute('font-family','Arial, Helvetica, sans-serif'); tx.textContent=t; return tx; }
+      function arrow(x1,y1,x2,y2){ const line=document.createElementNS(svgNS,'line'); line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2); line.setAttribute('stroke','#000'); line.setAttribute('stroke-width','3'); svg.appendChild(line); const ah=document.createElementNS(svgNS,'polygon'); const a=Math.atan2(y2-y1,x2-x1),L=14; const p1=[x2,y2]; const p2=[x2-L*Math.cos(a-Math.PI/6), y2-L*Math.sin(a-Math.PI/6)]; const p3=[x2-L*Math.cos(a+Math.PI/6), y2-L*Math.sin(a+Math.PI/6)]; ah.setAttribute('points', `${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}`); ah.setAttribute('fill','#000'); svg.appendChild(ah); }
+      function wrapLabel(svg, x, y, w, h, text, opts = {}) {
+        const fontSize = opts.fontSize || 24;
+        const lineHeight = Math.round(fontSize * 1.25);
+
+        // Padding inside the rounded rect
+        const padX = opts.padX ?? 12;
+        const padY = opts.padY ?? 12;
+
+        const maxWidth = Math.max(20, w - 2 * padX);
+        const cx = x + w / 2;
+
+        // Measuring node
+        const t = document.createElementNS(svgNS, 'text');
+        t.setAttribute('font-size', String(fontSize));
+        t.setAttribute('font-family', 'Arial, Helvetica, sans-serif');
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('dominant-baseline', 'text-before-edge'); // y is the top of the text box
+        svg.appendChild(t);
+
+        const words = String(text).split(/\s+/);
+        const lines = [];
+        let line = '';
+
+        function widthOf(str) {
+          t.textContent = str || ' ';
+          return t.getComputedTextLength();
+        }
+
+        for (const wd of words) {
+          const tryLine = line ? line + ' ' + wd : wd;
+          if (widthOf(tryLine) <= maxWidth) {
+            line = tryLine;
+          } else {
+            if (line) lines.push(line);
+            line = wd;
+          }
+        }
+        if (line) lines.push(line);
+
+        // Center within the vertical space AFTER padding
+        const blockH = lines.length * lineHeight;
+        const startY = y + padY + Math.max(0, (h - 2 * padY - blockH) / 2);
+
+        t.textContent = '';
+        lines.forEach((ln, i) => {
+          const span = document.createElementNS(svgNS, 'tspan');
+          span.setAttribute('x', String(cx));
+          span.setAttribute('y', String(startY + i * lineHeight));
+          span.textContent = ln;
+          t.appendChild(span);
+        });
+
+        return t;
+      }
+
+      const nodes = {
+        browser:{x:30,y:50,w:150,h:60,t:'Browser'},
+        next:{x:210,y:50,w:220,h:60,t:'Next.js  React  Tailwind'},
+        api:{x:460,y:50,w:200,h:60,t:'AWS API Gateway'},
+        lambda:{x:690,y:50,w:200,h:60,t:'AWS Lambda'},
+        ddb:{x:600,y:170,w:160,h:60,t:'DynamoDB'},
+        s3:{x:790,y:170,w:100,h:60,t:'S3'},
+        cf:{x:460,y:270,w:200,h:60,t:'CloudFront'}
+      };
+      Object.values(nodes).forEach(n => {svg.appendChild(rect(n.x, n.y, n.w, n.h, 10));svg.appendChild(wrapLabel(svg, n.x, n.y, n.w, n.h, n.t, { fontSize: 22 }));});
+
+
+      arrow(180,80,210,80);
+      arrow(430,80,460,80);
+      arrow(660,80,690,80);
+      arrow(790,110,680,170);
+      arrow(790,110,840,170);
+      arrow(560,270,560,110);
+      arrow(560,80,560,270);
+
+      box.appendChild(svg);
+    })();
+
+    const wrap = document.getElementById('wrap');
+    const zoomLabel = document.getElementById('zoomLabel');
+    function fitZoom(){ const posterW = 48*96, posterH = 36*96; const s = Math.min(window.innerWidth/posterW, window.innerHeight/posterH); applyZoom(Math.max(0.1, Math.min(1, s))); }
+    function applyZoom(z){ wrap.style.transform = `scale(${z})`; zoomLabel.textContent = Math.round(z*100) + '%'; document.getElementById('zoom').value = Math.round(z*100); }
+    function manualZoom(v){ applyZoom(v/100); }
+    window.addEventListener('resize', fitZoom); fitZoom();
+  </script>
+</body>
+</html>
