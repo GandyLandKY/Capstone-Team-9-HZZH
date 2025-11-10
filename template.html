@@ -116,6 +116,23 @@
     #title {
       color: #6f24f9;
     }
+    .band {
+      position: relative;
+      padding-right: 0.7in; /* makes room for the badge */
+    }
+    .band::after {
+      content: "";
+      position: absolute;
+      right: 0.2in;
+      bottom: 0.2in;
+      width: 3.9in;         /* adjust size here */
+      height: 3.9in;
+      background-image: url("capstone_website.png"); /* your file */
+      background-size: contain;
+      /* background-repeat: no-repeat; */
+      /* background-position: center; */
+      /* pointer-events: none;  ignore clicks */
+    }
   </style>
 </head>
 <body>
@@ -168,6 +185,15 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const bandEl = document.getElementById('band');
+    const img = document.createElement('img');
+    img.src = 'capstone_website.png';
+    img.alt = 'Capstone Website QR Code';
+    img.className = 'band-badge';
+    bandEl.appendChild(img);
+</script>
 
   <script>
     const j = id => JSON.parse(document.getElementById(id).textContent);
