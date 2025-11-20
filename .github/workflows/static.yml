@@ -42,6 +42,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Make index.html
+        run: cp dist/hzzh_poster_48x36_compact.html dist/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
